@@ -1,0 +1,223 @@
+interface Node {
+  id: ID!
+}
+
+type Beep implements Node {
+  id: ID!
+  user: User!
+  text: String!
+  # edit_history: [Beep]
+  # attachments:
+  # context_annotations: # onderwerpen van beep
+  conversation: Beep # when beep is reply
+  reference: Beep # rebeep, rebeep with comment / quoted beep
+  createdAt: Time
+  # entities:
+  # metrics: BeepMetrics # impressions, attachment clicks, profile clicks, likes, replies, rebeeps, quotes
+  sensitive: Boolean
+  config: String
+  location: String
+  impressionCount: Int
+  rebeepCount: Int
+  quoteCount: Int
+  likeCount: Int
+  replyCount: Int
+  urlClickCount: Int
+  profileClickCount: Int
+  detailsClickCount: Int
+  videoViewCount: Int
+}
+
+type AddedBeep {
+  text: String!
+}
+
+type User implements Node {
+  id: ID!
+  email: String!
+  name: String!
+  username: String
+  # password: String
+  createdAt: Time!
+  description: String
+  # entities
+  profileImg: String
+  bannerImg: String
+  dob: Int
+  # phoneNr: String
+  location: String
+  url: String
+  pinnedBeep: Beep
+  protected: Boolean
+  config: String
+  # metrics
+  # beeps: [Beep]
+}
+
+# type BeepMetrics {
+#   id: ID!
+#   impressionCount: Int
+#   rebeepCount: Int
+#   quoteCount: Int
+#   likeCount: Int
+#   replyCount: Int
+#   urlClickCount: Int
+#   profileClickCount: Int
+#   detailsClickCount: Int
+#   videoViewCount: Int
+# }
+
+# type UserMetrics {
+#   followersCount: Int
+#   followingCount: Int
+#   beepCount: Int
+#   listedCount: Int # ??
+# }
+
+# type Attachment {
+#   poll: Poll
+#   media: Media
+# }
+
+# type Poll {
+
+# }
+
+# type Media {
+#   id: ID!
+#   type: String!
+#   url: String
+#   alt: String
+#   variants: MediaVariant
+#   duration_ms: Int
+#   width: Int
+#   height: Int
+#   metrics: # view_count, count per quarter
+#   preview_img: String
+# }
+
+input CreateUser {
+  email: String!
+  name: String!
+  username: String
+  description: String
+  # entities
+  profileImg: String
+  bannerImg: String
+  dob: Int
+  location: String
+  url: String
+  pinnedBeepId: String
+  protected: Boolean
+  config: String
+}
+
+input CreateBeep {
+  userId: String!
+  text: String!
+  # edit_history: [Beep]
+  # attachments:
+  # context_annotations: # subjects of beep
+  conversationId: String # id of beep of which beep is reply
+  referenceId: String # rebeep, rebeep with comment / quoted beep
+  # entities:
+  # metrics: # impressions, attachment clicks, profile clicks, likes, replies, rebeeps, quotes
+  sensitive: Boolean
+  config: String
+  location: String
+}
+
+input UpdateBeep {
+  id: String!
+  userId: String
+  text: String
+  # edit_history: [Beep]
+  # attachments:
+  # context_annotations: # onderwerpen van beep
+  conversationId: String # when beep is reply
+  referenceId: String # rebeep, rebeep with comment / quoted beep
+  createdAt: Time
+  # entities:
+  # metrics: # impressions, attachment clicks, profile clicks, likes, replies, rebeeps, quotes
+  sensitive: Boolean
+  config: String
+  location: String
+}
+
+input UpdateBeepMetrics {
+  id: String!
+  impressionCount: Int
+  rebeepCount: Int
+  quoteCount: Int
+  likeCount: Int
+  replyCount: Int
+  urlClickCount: Int
+  profileClickCount: Int
+  detailsClickCount: Int
+  videoViewCount: Int
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type UserEdge {
+  cursor: String!
+  node: User
+}
+
+type UserConnection {
+  edges: [UserEdge]
+  pageInfo: PageInfo!
+}
+
+type BeepEdge {
+  cursor: String!
+  node: Beep
+}
+
+type BeepConnection {
+  edges: [BeepEdge]
+  pageInfo: PageInfo!
+}
+
+type Query {
+  getUserByID(id: ID!): User
+  getUserByUsername(username: String!): User
+  getAllUsers(
+    first: Int
+    last: Int
+    after: String
+    before: String
+  ): UserConnection
+  getBeepByID(id: ID!): Beep
+  getAllBeeps(
+    first: Int
+    last: Int
+    after: String
+    before: String
+  ): BeepConnection
+  getAllBeepsByUserUsername(
+    username: String!
+    first: Int
+    last: Int
+    after: String
+    before: String
+  ): BeepConnection
+}
+
+type Mutation {
+  createUser(input: CreateUser!): User
+  createBeep(input: CreateBeep!): Beep
+  updateBeep(input: UpdateBeep!): Beep
+  updateBeepMetrics(input: UpdateBeepMetrics!): Beep
+}
+
+type Subscription {
+  beepAdded: AddedBeep!
+}
+
+scalar Time
